@@ -5,19 +5,8 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
 
-import { base, _getAllRecords } from './airtable'
+import { getBase, _getAllRecords } from './airtable/index'
 import firstTimeConversation from './learnbot/firstTimeConversation'
-
-const {
-  AIRTABLE_MEMBERS,
-  AIRTABLE_APPLICANTS,
-  AIRTABLE_PAIRING
-} = process.env
-
-if (!AIRTABLE_MEMBERS && !AIRTABLE_APPLICANTS && !AIRTABLE_PAIRING) {
-  console.log('Error: Specify AIRTABLE_MEMBERS, AIRTABLE_APPLICANTS and AIRTABLE_PAIRING in a .env file')
-  process.exit(1)
-}
 
 // get slack user info by id
 export const getSlackUser = async (bot, id) => {
@@ -27,15 +16,17 @@ export const getSlackUser = async (bot, id) => {
 }
 
 // get member by id
-export const getMember = async (id) => {
-  const findMember = Promise.promisify(base(AIRTABLE_MEMBERS).find)
+export const getMember = async (teamId, id) => {
+  const base = await getBase(teamId)
+  const findMember = Promise.promisify(base('Users').find)
   const member = await findMember(id)
   return member
 }
 
 // get applicant with slack handle
-export const getApplicant = async (slackHandle) => {
-  const applicant = await _getAllRecords(base(AIRTABLE_APPLICANTS).select({
+export const getApplicant = async (teamId, slackHandle) => {
+  const base = await getBase(teamId)
+  const applicant = await _getAllRecords(base('P2PL Applicants').select({
     maxRecords: 1,
     filterByFormula: `{Slack Handle}='@${slackHandle}'`
   }))
@@ -43,8 +34,9 @@ export const getApplicant = async (slackHandle) => {
 }
 
 // update applicant with slack handle
-export const updateApplicant = async (slackHandle, obj) => {
-  const update = Promise.promisify(base(AIRTABLE_APPLICANTS).update)
+export const updateApplicant = async (teamId, slackHandle, obj) => {
+  const base = await getBase(teamId)
+  const update = Promise.promisify(base('P2PL Applicants').update)
   const {id} = await getApplicant(slackHandle)
   const applicant = update(id, obj)
   return applicant
@@ -55,8 +47,9 @@ export const updateApplicant = async (slackHandle, obj) => {
  interests: [String],
  skills: [String]}
  */
-export const getAllApplicants = async () => {
-  const records = await _getAllRecords(base(AIRTABLE_APPLICANTS).select({
+export const getAllApplicants = async (teamId) => {
+  const base = await getBase(teamId)
+  const records = await _getAllRecords(base('P2PL Applicants').select({
     view: 'Main View',
     fields: ['Slack Handle', 'Interests', 'Skills', 'Admin', 'Applicant'],
     filterByFormula: '{Inactive}=0'
@@ -103,8 +96,9 @@ export const checkIfFirstTime = async (bot, message) => {
 // a boolean checking if the current user is an admin or not.
 export const checkIfAdmin = async (bot, message) => {
   const admins = []
+  const base = await getBase(bot.config.id)
   const apiUser = Promise.promisifyAll(bot.api.users)
-  const records = await _getAllRecords(base(AIRTABLE_APPLICANTS).select({
+  const records = await _getAllRecords(base('P2PL Applicants').select({
     view: 'Main View',
     filterByFormula: '{Admin}=1'
   }))
@@ -147,8 +141,9 @@ export const getMembersPaired = async () => {
   return members
 }
 
-export const getPairingsNotIntroduced = async () => {
-  const pairings = await _getAllRecords(base(AIRTABLE_PAIRING).select({
+export const getPairingsNotIntroduced = async (teamId) => {
+  const base = await getBase(teamId)
+  const pairings = await _getAllRecords(base('P2PL Applicants').select({
     view: 'Main View',
     filterByFormula: '{Introduced}=0'
   }))
@@ -156,7 +151,8 @@ export const getPairingsNotIntroduced = async () => {
 }
 
 // reads a Pairing from Airtable
-export const getPairing = async (tableName, pairingId) => {
+export const getPairing = async (teamId, tableName, pairingId) => {
+  const base = await getBase(teamId)
   const pairingRecords = await _getAllRecords(base(tableName).select({
     view: 'Main View',
     fields: ['Teacher', 'Learner', 'Skill', 'Paired On'],
@@ -177,7 +173,8 @@ export const getPairing = async (tableName, pairingId) => {
 }
 
 // saves a Pairing to Airtable
-export const savePairing = async (tableName, pairing) => {
+export const savePairing = async (teamId, tableName, pairing) => {
+  const base = await getBase(teamId)
   // ensure we have the proper structure
   if (!pairing.id) return console.log('missing pairing.id')
   if (!_.isArray(pairing.pairs)) return console.log('invalid pairing.pairs')
@@ -196,7 +193,8 @@ export const savePairing = async (tableName, pairing) => {
 }
 
 // removes a Pairing from Airtable
-export const destroyPairing = async (tableName, pairingId) => {
+export const destroyPairing = async (teamId, tableName, pairingId) => {
+  const base = await getBase(teamId)
   const pairingRecords = await _getAllRecords(base(tableName).select({
     view: 'Main View',
     fields: [],

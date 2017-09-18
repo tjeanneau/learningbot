@@ -42,7 +42,7 @@ controller.hears('^pair all applicants$', ['direct_message', 'direct_mention'], 
     if (isAdmin) {
       const botReply = Promise.promisify(bot.reply)
       await botReply(message, 'Ok, I\'ll start pairing people')
-      const pairing = await pairAllApplicants()
+      const pairing = await pairAllApplicants(bot.config.id)
       await botReply(message, `Pairing done, saved to Airtable.\n It contains ${pairing.pairs.length} pairs.`)
     } else {
       bot.reply(message, 'Sorry but it looks like you\'re not an admin. You can\'t use this feature.')
@@ -122,7 +122,7 @@ controller.hears('^start$', ['direct_message', 'direct_mention'], async (bot, me
     if (await checkIfFirstTime(bot, message) === false) return
     bot.reply(message, 'Amaaaaaaaaaaaazing 🎉\'! I\'ll let you know when the next session starts! Happy Learning!')
     const {name} = await getSlackUser(bot, message.user)
-    await updateApplicant(name, {'Inactive': false})
+    await updateApplicant(bot.config.id, name, {'Inactive': false})
   } catch (e) {
     console.log(e)
     bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
@@ -138,7 +138,7 @@ controller.hears('^stop$', ['direct_message', 'direct_mention'], async (bot, mes
       convo.say('You can start again by messaging me with `start`.')
     })
     const {name} = await getSlackUser(bot, message.user)
-    await updateApplicant(name, {'Inactive': true})
+    await updateApplicant(bot.config.id, name, {'Inactive': true})
   } catch (e) {
     console.log(e)
     bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
@@ -149,8 +149,8 @@ controller.hears('^show profile$', ['direct_message', 'direct_mention'], async (
   try {
     if (await checkIfFirstTime(bot, message) === false) return
     const {name} = await getSlackUser(bot, message.user)
-    const rec = await getApplicant(name)
-    const {fields} = await getMember(rec.get('Applicant')[0])
+    const rec = await getApplicant(bot.config.id, name)
+    const {fields} = await getMember(bot.config.id, rec.get('Applicant')[0])
     const isInactive = rec.get('Inactive') === true
     bot.reply(message, {
       'text': `:sparkles: This is your profile <@${message.user}|${name}> :sparkles:`,
@@ -185,12 +185,12 @@ controller.hears('^show all applicants$', ['direct_message', 'direct_mention'], 
     const botReply = Promise.promisify(bot.reply)
     const apiUser = Promise.promisifyAll(bot.api.users)
     await botReply(message, `Okay, don't move, I'm searching everybody :sleuth_or_spy:`)
-    const people = await getAllApplicants()
+    const people = await getAllApplicants(bot.config.id)
     const {members} = await apiUser.listAsync({token: bot.config.bot.app_token})
     const attachments = []
     forEach(people, async function (person) {
       const done = this.async()
-      const {fields} = await getMember(person.applicant)
+      const {fields} = await getMember(bot.config.id, person.applicant)
       const {id} = _.find(members, (m) => m.name === person.name)
       attachments.push({
         'title': `:sparkles: <@${id}|${person.name}> :sparkles:`,

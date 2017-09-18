@@ -18,7 +18,7 @@ app.set('port', process.env.PORT || 5000)
 // For development you can use ngrok and set up a dedicated *.ngrok.io domain for each bot
 // For production, you should set up your DNS to point different domain names to your server
 const botSetups = [
-  {controller: learnbot, hostname: (process.env.LEARNINGBOT_HOSTNAME || 'learnbot.local')},
+  {controller: learnbot, hostname: (process.env.LEARNBOT_HOSTNAME || 'learnbot.local')},
 ]
 
 // Optional setting to override the hostname, makes the app behave as if

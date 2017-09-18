@@ -8,9 +8,9 @@ export default (bot, message, userInfo) => {
   bot.startPrivateConversation(message, (err, convo) => {
     if (err) return console.log(err)
     convo.say(`Hey ${userInfo.name}! :wave:`)
-    convo.say(`I'm the Learning Bot, part of the peer-to-peer learning program inside Mangrove.`)
-    convo.say(`I have been built to make people inside of Mangrove learn from each other.`)
-    convo.say(`Every month, you could be paired with another Mangrover to teach and learn new skills.`)
+    convo.say(`I'm the <@learnbot> :smile:`)
+    convo.say(`I have been built to make people inside of your team learn from each other.`)
+    convo.say(`Every month, you could be paired with another team member to teach and learn new skills.`)
     convo.ask({
       attachments: [
         {
@@ -38,7 +38,7 @@ export default (bot, message, userInfo) => {
         pattern: 'yes',
         callback: function (reply, convo) {
           convo.say('Amaaaaaaaaaaaazing 🎉')
-          convo.say(`I'm your new learning buddy 🐹 please fill in this form to tell me which skills you want to learn and share: https://airtable.com/shrSHhIaFz8A0PRnM`)
+          convo.say(`I'm your new learning buddy 🐹 please fill in this form to tell me which skills you want to learn and share: https://airtable.com/shrKdP3WjGenXQfMN`)
           convo.say(`If you ever want to stop being paired, which would be very sad 😥, just tell me \`stop\``)
           convo.say(`And if you need help, just tell me \`help\` :wink:`)
           convo.next()

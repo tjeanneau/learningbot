@@ -4,30 +4,20 @@ import { getAllApplicants, savePairing } from '../methods'
 
 require('dotenv').config()
 
-const {
-  AIRTABLE_APPLICANTS,
-  AIRTABLE_PAIRING
-} = process.env
-
-if (!AIRTABLE_APPLICANTS || !AIRTABLE_PAIRING) {
-  console.log('Error: Specify AIRTABLE_APPLICANTS and AIRTABLE_PAIRING in a .env file')
-  process.exit(1)
-}
-
 // Main pairing function:
 // - reads all applicants from Airtable
 // - creates a pairing
 // - saves the pairing into Airtable and returns it
 // Different tables can be set up through options
-export const pairAllApplicants = async (opts = {}) => {
-  const aTable = opts.applicantsTable || AIRTABLE_APPLICANTS
-  const pTable = opts.pairingsTable || AIRTABLE_PAIRING
+export const pairAllApplicants = async (teamId, opts = {}) => {
+  const aTable = opts.applicantsTable || 'P2PL Applicants'
+  const pTable = opts.pairingsTable || 'P2PL Pairing'
   console.log(`Pairing people in ${aTable}, saving in ${pTable}`)
   const people = await getAllApplicants(aTable)
   console.log(`Found ${people.length} people in ${aTable}`)
   const pairing = await generatePairing(people)
   console.log(`Saving ${pairing.pairs.length} pairs to ${pTable}, id=${pairing.id}`)
-  await savePairing(pTable, pairing)
+  await savePairing(teamId, pTable, pairing)
   return pairing
 }
 

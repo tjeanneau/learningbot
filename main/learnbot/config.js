@@ -2,19 +2,20 @@
  * Created by thomasjeanneau on 08/02/2017.
  */
 
-import localTunnel from 'localtunnel'
 import Botkit from 'mangrove-botkit'
 import BotkitStorageMongo from 'botkit-storage-mongo'
 
+import { base } from '../airtable/index'
+
 const _bots = {}
 const {
-  LEARNINGBOT_SLACK_CLIENT_ID,
-  LEARNINGBOT_SLACK_CLIENT_SECRET,
-  LEARNINGBOT_MONGODB_URI
+  SLACK_CLIENT_ID,
+  SLACK_CLIENT_SECRET,
+  MONGODB_URI,
 } = process.env
 
-if (!LEARNINGBOT_SLACK_CLIENT_ID || !LEARNINGBOT_SLACK_CLIENT_SECRET || !LEARNINGBOT_MONGODB_URI) {
-  console.log('Error: Specify LEARNINGBOT_SLACK_CLIENT_ID, LEARNINGBOT_SLACK_CLIENT_SECRET and LEARNINGBOT_MONGODB_URI in a .env file')
+if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET || !MONGODB_URI) {
+  console.log('Error: Specify SLACK_CLIENT_ID, SLACK_CLIENT_SECRET and MONGODB_URI in a .env file')
   process.exit(1)
 }
 
@@ -23,7 +24,7 @@ const trackBot = (bot) => {
 }
 
 const mongoStorage = new BotkitStorageMongo({
-  mongoUri: LEARNINGBOT_MONGODB_URI
+  mongoUri: MONGODB_URI
 })
 
 const controller = Botkit.slackbot({
@@ -35,21 +36,28 @@ const controller = Botkit.slackbot({
 })
 
 controller.configureSlackApp({
-  clientId: LEARNINGBOT_SLACK_CLIENT_ID,
-  clientSecret: LEARNINGBOT_SLACK_CLIENT_SECRET,
+  clientId: SLACK_CLIENT_ID,
+  clientSecret: SLACK_CLIENT_SECRET,
   scopes: ['bot', 'chat:write:bot', 'groups:history', 'groups:read', 'groups:write', 'users:read', 'users:read.email']
 })
 
-controller.on('create_bot', (bot, config) => {
+controller.on('create_bot', async (bot, config) => {
+  console.log(bot.config)
   if (_bots[bot.config.token]) {
     // already online! do nothing.
   } else {
+    const create = Promise.promisify(base('Companies').create)
+    await create({
+      'Name': bot.config.name,
+      'Team ID': bot.config.id,
+      'Created By': bot.config.createdBy,
+      'Url': bot.config.url
+    })
     bot.startRTM((err) => {
       if (!err) trackBot(bot)
       bot.startPrivateConversation({user: config.createdBy}, (err, convo) => {
         if (err) return console.log(err)
-        convo.say('I am a bot that has just joined your team')
-        convo.say('You must now /invite me to a channel so that I can be of use!')
+        convo.say('Hey! I am the <@learnbot> that has just joined your team :smile:')
       })
     })
   }

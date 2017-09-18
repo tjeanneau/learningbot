@@ -1,4 +1,5 @@
 import Airtable from 'airtable'
+import Promise from 'bluebird'
 
 require('dotenv').config()
 
@@ -17,9 +18,6 @@ Airtable.configure({
   apiKey: AIRTABLE_API_KEY
 })
 
-// allows accessing tables directly
-export const base = Airtable.base(AIRTABLE_BASE_KEY)
-
 // reads all records from a table
 export const _getAllRecords = (select) => {
   return new Promise((resolve, reject) => {
@@ -32,4 +30,16 @@ export const _getAllRecords = (select) => {
       resolve(allRecords)
     })
   })
+}
+
+// allows accessing tables directly
+export const base = Airtable.base(AIRTABLE_BASE_KEY)
+
+export const getBase = async (teamId) => {
+  const records = await _getAllRecords(base('Companies').select({
+    view: 'Main view',
+    filterByFormula: `{Team ID} = '${teamId}'`
+  }))
+  const baseKey = records[0].fields['Airtable Base']
+  return Airtable.base(baseKey)
 }

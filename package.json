@@ -53,13 +53,13 @@
   "main": "main/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MeetMangrove/familybot.git"
+    "url": "git+https://bitbucket.org/mangrove_io/learnbot.git"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MeetMangrove/familybot/issues"
+    "url": "https://bitbucket.org/mangrove_io/learnbot/issues"
   },
-  "homepage": "https://github.com/MeetMangrove/familybot#readme"
+  "homepage": "https://bitbucket.org/mangrove_io/learnbot"
 }

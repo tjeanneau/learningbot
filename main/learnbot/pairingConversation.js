@@ -6,21 +6,21 @@ import _ from 'lodash'
 import Promise from 'bluebird'
 import asyncForEach from 'async-foreach'
 
-import { base } from '../airtable/index'
+import { getBase } from '../airtable/index'
 import { getPairingsNotIntroduced } from '../methods'
 
-const {AIRTABLE_PAIRING} = process.env
 const {forEach} = asyncForEach
 
 export default async (bot, message, membersPaired) => {
+  const base = await getBase(bot.config.id)
   const apiUser = Promise.promisifyAll(bot.api.users)
   const apiGroups = Promise.promisifyAll(bot.api.groups)
-  const airtableUpdate = Promise.promisify(base(AIRTABLE_PAIRING).update)
+  const airtableUpdate = Promise.promisify(base('P2PL Pairing').update)
   const botSay = Promise.promisify(bot.say)
   const token = bot.config.bot.app_token
   const {members} = await apiUser.listAsync({token})
   const list = _.map(members, member => _.pick(member, ['id', 'name']))
-  const pairingsNotIntroduced = await getPairingsNotIntroduced()
+  const pairingsNotIntroduced = await getPairingsNotIntroduced(bot.config.id)
   forEach(pairingsNotIntroduced, async function (pairing) {
     const done = this.async()
     const teacher = _.find(list, ['name', pairing.get('Teacher')])
