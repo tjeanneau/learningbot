@@ -272,4 +272,3 @@ controller.hears('[^\n]+', ['direct_message', 'direct_mention'], async (bot, mes
   }
 })
 
-export default controller
