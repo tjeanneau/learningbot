@@ -18,6 +18,7 @@ import {
 } from '../methods'
 import { pairAllApplicants } from './pairing'
 import { controller } from './config'
+import { base, _getAllRecords } from '../airtable/index'
 
 import pairingConversation from './pairingConversation'
 import startAPairingSession from './startAPairingSession'
@@ -83,7 +84,12 @@ controller.hears('^send presentation message to no-applicants$', ['direct_messag
       forEach(noApplicants, async function ({id, name}) {
         const done = this.async()
         if (NODE_ENV === 'PRODUCTION') {
-          firstTimeConversation(bot, {user: id}, {name})
+          const records = await _getAllRecords(base('Companies').select({
+            view: 'Main view',
+            filterByFormula: `{Team ID} = '${bot.config.id}'`
+          }))
+          const formId = records[0].fields['Learnbot Form ID']
+          firstTimeConversation(bot, {user: id}, {name, formId})
         } else {
           console.log('Send to', name)
         }
@@ -108,7 +114,7 @@ controller.hears(['^Hello$', '^Yo$', '^Hey$', '^Hi$', '^Ouch$'], ['direct_messag
     bot.startConversation(message, function (err, convo) {
       if (err) return console.log(err)
       convo.say(`Hey ${name}!`)
-      convo.say(`I'm your new learning buddy 🐹 I will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪`)
+      convo.say(`I'm your new learning buddy 🐹 \nI will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪`)
       convo.say(`If you ever want to stop being paired, which would be very sad 😥, just tell me \`stop\``)
     })
   } catch (e) {
@@ -246,7 +252,7 @@ controller.hears(['^help$', '^options$'], ['direct_message', 'direct_mention'], 
       await botReply(message, {
         attachments: [{
           pretext: 'And because you\'re an Admin, you can also do:',
-          text: `\`pair all applicants\` - run the pairing algorithm and fill the <https://airtable.com/tbldvVUdJC0ScZdMe/viw7hEm5LC0qXVpqR|Pairings Table>\n\`introduce new pairings\` - send a message to all applicants about their new pairings\n\`send presentation message to no-applicants\` - I introduce myself to people who are not applicants yet`,
+          text: `\`pair all applicants\` - run the pairing algorithm and fill the Pairings Table in Airtable\n\`introduce new pairings\` - send a message to all applicants about their new pairings\n\`send presentation message to no-applicants\` - I introduce myself to people who are not applicants yet`,
           mrkdwn_in: ['text', 'pretext']
         }]
       })
