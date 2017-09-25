@@ -5,7 +5,7 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
 
-import { getBase, _getAllRecords } from './airtable/index'
+import { base, getBase, _getAllRecords } from './airtable/index'
 import firstTimeConversation from './learnbot/firstTimeConversation'
 
 // get slack user info by id
@@ -37,7 +37,7 @@ export const getApplicant = async (teamId, slackHandle) => {
 export const updateApplicant = async (teamId, slackHandle, obj) => {
   const base = await getBase(teamId)
   const update = Promise.promisify(base('P2PL Applicants').update)
-  const {id} = await getApplicant(slackHandle)
+  const {id} = await getApplicant(teamId, slackHandle)
   const applicant = update(id, obj)
   return applicant
 }
@@ -50,12 +50,12 @@ export const updateApplicant = async (teamId, slackHandle, obj) => {
 export const getAllApplicants = async (teamId) => {
   const base = await getBase(teamId)
   const records = await _getAllRecords(base('P2PL Applicants').select({
-    view: 'Main View',
-    fields: ['Slack Handle', 'Interests', 'Skills', 'Admin', 'Applicant'],
+    view: 'Grid view',
+    fields: ['Slack handle', 'Interests', 'Skills', 'Admin', 'Applicant'],
     filterByFormula: '{Inactive}=0'
   }))
   return _.reduce(records, (people, r) => {
-    const name = (r.get('Slack Handle') || [])[0]
+    const name = (r.get('Slack handle') || [])[0]
     if (name && name.length) {
       people.push({
         name: name.replace(/^@/, ''),
@@ -85,9 +85,14 @@ export const getAllNoApplicants = async (bot) => {
 
 export const checkIfFirstTime = async (bot, message) => {
   const {name} = await getSlackUser(bot, message.user)
-  const applicant = await getApplicant(name)
+  const applicant = await getApplicant(bot.config.id, name)
   if (!!applicant === false) {
-    await firstTimeConversation(bot, message, {name})
+    const records = await _getAllRecords(base('Companies').select({
+      view: 'Main view',
+      filterByFormula: `{Team ID} = '${bot.config.id}'`
+    }))
+    const formId = records[0].fields['Learnbot Form ID']
+    await firstTimeConversation(bot, message, {name, formId})
   }
   return !!applicant
 }
@@ -99,7 +104,7 @@ export const checkIfAdmin = async (bot, message) => {
   const base = await getBase(bot.config.id)
   const apiUser = Promise.promisifyAll(bot.api.users)
   const records = await _getAllRecords(base('P2PL Applicants').select({
-    view: 'Main View',
+    view: 'Grid view',
     filterByFormula: '{Admin}=1'
   }))
   records.forEach((record) => {
@@ -143,8 +148,8 @@ export const getMembersPaired = async () => {
 
 export const getPairingsNotIntroduced = async (teamId) => {
   const base = await getBase(teamId)
-  const pairings = await _getAllRecords(base('P2PL Applicants').select({
-    view: 'Main View',
+  const pairings = await _getAllRecords(base('P2PL Pairing').select({
+    view: 'Grid view',
     filterByFormula: '{Introduced}=0'
   }))
   return pairings
@@ -154,7 +159,7 @@ export const getPairingsNotIntroduced = async (teamId) => {
 export const getPairing = async (teamId, tableName, pairingId) => {
   const base = await getBase(teamId)
   const pairingRecords = await _getAllRecords(base(tableName).select({
-    view: 'Main View',
+    view: 'Grid view',
     fields: ['Teacher', 'Learner', 'Skill', 'Paired On'],
     filterByFormula: `{Pairing Id}='${pairingId}'`
   }))
@@ -196,7 +201,7 @@ export const savePairing = async (teamId, tableName, pairing) => {
 export const destroyPairing = async (teamId, tableName, pairingId) => {
   const base = await getBase(teamId)
   const pairingRecords = await _getAllRecords(base(tableName).select({
-    view: 'Main View',
+    view: 'Grid view',
     fields: [],
     filterByFormula: `{Pairing Id}='${pairingId}'`
   }))

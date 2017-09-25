@@ -159,7 +159,7 @@ controller.hears('^show profile$', ['direct_message', 'direct_mention'], async (
           'title': isInactive ? ':sleeping: Inactive' : ':hand: Active',
           'text': isInactive ? 'You\'re not gonna be paired with another P2PL applicants' : 'I can pair you with another P2PL applicants',
           'color': isInactive ? '#E0E0E0' : '#81C784',
-          'thumb_url': fields['Profile Picture'][0].url
+          'thumb_url': fields['Profile Picture'] ? fields['Profile Picture'][0].url : null
         },
         {
           'title': ':sleuth_or_spy: Interests',
@@ -195,7 +195,7 @@ controller.hears('^show all applicants$', ['direct_message', 'direct_mention'], 
       attachments.push({
         'title': `:sparkles: <@${id}|${person.name}> :sparkles:`,
         'color': '#E57373',
-        'thumb_url': fields['Profile Picture'][0].url,
+        'thumb_url': fields['Profile Picture'] ? fields['Profile Picture'][0].url : null,
         'fields': [
           {
             'title': ':sleuth_or_spy: Interests',
