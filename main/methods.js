@@ -76,7 +76,7 @@ export const getAllApplicants = async (teamId) => {
 export const getAllNoApplicants = async (bot) => {
   const apiUser = Promise.promisifyAll(bot.api.users)
   const {members} = await apiUser.listAsync({token: bot.config.bot.app_token})
-  const applicants = await getAllApplicants()
+  const applicants = await getAllApplicants(bot.config.id)
   const listMember = _.map(members, ({id, name}) => ({id, name}))
   const listApplicants = _.map(applicants, ({name}) => name)
   _.remove(listMember, ({name}) => listApplicants.indexOf(name) >= 0)
@@ -108,7 +108,7 @@ export const checkIfAdmin = async (bot, message) => {
     filterByFormula: '{Admin}=1'
   }))
   records.forEach((record) => {
-    const name = record.get('Slack Handle')[0]
+    const name = record.get('Slack handle')[0]
     admins.push(name.replace(/^@/, ''))
   })
   const {user: {name}} = await apiUser.infoAsync({user: message.user})
@@ -124,10 +124,10 @@ export const checkIfAdmin = async (bot, message) => {
  learnerName: String,
  teaching: String}
  */
-export const getMembersPaired = async () => {
-  const applicants = await getAllApplicants()
+export const getMembersPaired = async (teamId) => {
+  const applicants = await getAllApplicants(teamId)
   const members = _.map(applicants, ({name}) => ({name, isLearner: false, isTeacher: false}))
-  const pairings = await getPairingsNotIntroduced()
+  const pairings = await getPairingsNotIntroduced(teamId)
   pairings.forEach((record) => {
     const learner = record.get('Learner')
     const teacher = record.get('Teacher')

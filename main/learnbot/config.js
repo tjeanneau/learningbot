@@ -8,6 +8,8 @@ import BotkitStorageMongo from 'botkit-storage-mongo'
 import Promise from 'bluebird'
 
 import { base } from '../airtable/index'
+import { getSlackUser } from '../methods'
+import firstTimeConversation from './firstTimeConversation'
 
 require('dotenv').config()
 
@@ -88,6 +90,11 @@ controller.on('create_bot', async (bot, config) => {
       })
     })
   }
+})
+
+controller.on('team_join', async function(bot,message) {
+  const {name} = await getSlackUser(bot, message.user)
+  await firstTimeConversation(bot, message, {name})
 })
 
 controller.on('rtm_open', () => {

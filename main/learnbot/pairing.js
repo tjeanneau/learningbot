@@ -13,7 +13,7 @@ export const pairAllApplicants = async (teamId, opts = {}) => {
   const aTable = opts.applicantsTable || 'P2PL Applicants'
   const pTable = opts.pairingsTable || 'P2PL Pairing'
   console.log(`Pairing people in ${aTable}, saving in ${pTable}`)
-  const people = await getAllApplicants(aTable)
+  const people = await getAllApplicants(teamId)
   console.log(`Found ${people.length} people in ${aTable}`)
   const pairing = await generatePairing(people)
   console.log(`Saving ${pairing.pairs.length} pairs to ${pTable}, id=${pairing.id}`)
