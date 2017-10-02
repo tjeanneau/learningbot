@@ -6,6 +6,7 @@ import localTunnel from 'localtunnel'
 import Botkit from 'mangrove-botkit'
 import BotkitStorageMongo from 'botkit-storage-mongo'
 import Promise from 'bluebird'
+import { __ } from 'i18n'
 
 import { base } from '../airtable/index'
 import { getSlackUser } from '../methods'
@@ -86,7 +87,7 @@ controller.on('create_bot', async (bot, config) => {
       if (!err) trackBot(bot)
       bot.startPrivateConversation({user: config.createdBy}, (err, convo) => {
         if (err) return console.log(err)
-        convo.say('Hey! I am the <@learnbot> that has just joined your team :smile:')
+        convo.say(__('config.intro'))
       })
     })
   }

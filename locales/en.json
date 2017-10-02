@@ -1,4 +1,7 @@
 {
+  "config": {
+    "intro": "Hey! I am the <@learnbot> that has just joined your team :smile:"
+  },
   "firstTimeConversation": {
     "presentation1": "Hey {{name}}! :wave:",
     "presentation2": "I'm the {{id}} :smile:",
@@ -25,7 +28,7 @@
     "hello1": "Hey {{name}}!",
     "hello2": "I'm your new learning buddy 🐹 I will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪",
     "hello3": "If you ever want to stop being paired, which would be very sad 😥, just tell me `stop`",
-    "start": "Amaaaaaaaaaaaazing 🎉'! I'll let you know when the next session starts! Happy Learning!",
+    "start": "Amaaaaaaaaaaaazing 🎉! I'll let you know when the next session starts! Happy Learning!",
     "stop1": "Okay 😥, sorry to see you go.",
     "stop2": "You can start again by messaging me with `start`.",
     "showProfile1": ":sparkles: This is your profile <@{{id}}|{{name}}> :sparkles:",
