@@ -1,32 +1,28 @@
-// There should be two ways to activate the conversation:
-// 1- New person joins the general channel
-//    They should get a private message with the conversation
-// 2- An admin sends a first-time command
-//    Every person in the slack should get a private message with the conversation
+import { __ } from 'i18n'
 
 export default (bot, message, userInfo) => {
   bot.startPrivateConversation(message, (err, convo) => {
     if (err) return console.log(err)
-    convo.say(`Hey ${userInfo.name}! :wave:`)
-    convo.say(`I'm the <@${bot.config.bot.user_id}> :smile:`)
-    convo.say(`I have been built to make people inside of your team learn from each other.`)
-    convo.say(`Every month, you could be paired with another team member to teach and learn new skills.`)
+    convo.say(__('firstTimeConversation.presentation1', { name: userInfo.name }))
+    convo.say(__('firstTimeConversation.presentation2', { id: bot.config.bot.user_id }))
+    convo.say(__('firstTimeConversation.presentation3'))
+    convo.say(__('firstTimeConversation.presentation4'))
     convo.ask({
       attachments: [
         {
-          title: 'Want to try it out?',
+          title: __('firstTimeConversation.ask'),
           callback_id: '123',
           attachment_type: 'default',
           actions: [
             {
               'name': 'yes',
-              'text': 'Yes',
+              'text': __('firstTimeConversation.yes'),
               'value': 'yes',
               'type': 'button'
             },
             {
               'name': 'no',
-              'text': 'No',
+              'text': __('firstTimeConversation.no'),
               'value': 'no',
               'type': 'button'
             }
@@ -37,17 +33,17 @@ export default (bot, message, userInfo) => {
       {
         pattern: 'yes',
         callback: function (reply, convo) {
-          convo.say('Amaaaaaaaaaaaazing 🎉')
-          convo.say(`I'm your new learning buddy 🐹 please fill in this form to tell me which skills you want to learn and share: https://airtable.com/${userInfo.formId}`)
-          convo.say(`If you ever want to stop being paired, which would be very sad 😥, just tell me \`stop\``)
-          convo.say(`And if you need help, just tell me \`help\` :wink:`)
+          convo.say(__('firstTimeConversation.resYes1'))
+          convo.say(__('firstTimeConversation.resYes2', { formId: userInfo.formId }))
+          convo.say(__('firstTimeConversation.resYes3'))
+          convo.say(__('firstTimeConversation.resYes4'))
           convo.next()
         }
       },
       {
         pattern: 'no',
         callback: function (reply, convo) {
-          convo.say('Okay, just know that you can start anytime, just go back to see me when you feel ready.')
+          convo.say(__('firstTimeConversation.resNo'))
           convo.next()
         }
       },

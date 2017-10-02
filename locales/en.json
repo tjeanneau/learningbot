@@ -1,0 +1,57 @@
+{
+  "firstTimeConversation": {
+    "presentation1": "Hey {{name}}! :wave:",
+    "presentation2": "I'm the {{id}} :smile:",
+    "presentation3": "I have been built to make people inside of your team learn from each other.",
+    "presentation4": "Every month, you could be paired with another team member to teach and learn new skills.",
+    "ask": "Want to try it out?",
+    "yes": "Yes",
+    "no": "No",
+    "resYes1": "Amaaaaaaaaaaaazing 🎉",
+    "resYes2": "I'm your new learning buddy 🐹 please fill in this form to tell me which skills you want to learn and share: https://airtable.com/{{formId}}",
+    "resYes3": "If you ever want to stop being paired, which would be very sad 😥, just tell me `stop`",
+    "resYes4": "And if you need help, just tell me `help` :wink:",
+    "resNo": "Okay, just know that you can start anytime, just go back to see me when you feel ready."
+  },
+  "hears": {
+    "notAdmin": "Sorry but it looks like you're not an admin. You can't use this feature.",
+    "error": "Oops..! :sweat_smile: A little error occur: `{{error}}`",
+    "pairAllApplicants1": "Ok, I'll start pairing people",
+    "pairAllApplicants2": "Pairing done, saved to Airtable.\n It contains {{length}} pairs.",
+    "introduceNewPairing1": "Ok, I'll start introducing people :sparkles:",
+    "introduceNewPairing2": "All people have been introduced :rocket:",
+    "presentationMessage1": "Okay, I send a message to all people who are not applicants yet!",
+    "presentationMessage2": "All done! :rocket:",
+    "hello1": "Hey {{name}}!",
+    "hello2": "I'm your new learning buddy 🐹 I will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪",
+    "hello3": "If you ever want to stop being paired, which would be very sad 😥, just tell me `stop`",
+    "start": "Amaaaaaaaaaaaazing 🎉'! I'll let you know when the next session starts! Happy Learning!",
+    "stop1": "Okay 😥, sorry to see you go.",
+    "stop2": "You can start again by messaging me with `start`.",
+    "showProfile1": ":sparkles: This is your profile <@{{id}}|{{name}}> :sparkles:",
+    "showProfile2": ":sleeping: Inactive",
+    "showProfile3": ":hand: Active",
+    "showProfile4": "You're not gonna be paired with another P2PL applicants",
+    "showProfile5": "I can pair you with another P2PL applicants",
+    "showProfile6": ":sleuth_or_spy: Interests",
+    "showProfile7": ":muscle: Skills",
+    "showAllApplicant1": "Okay, don't move, I'm searching everybody :sleuth_or_spy:",
+    "showAllApplicant2": ":sparkles: <@{{id}}|{{name}}> :sparkles:",
+    "showAllApplicant3": ":sleuth_or_spy: Interests",
+    "showAllApplicant4": ":muscle: Skills",
+    "showAllApplicant5": "There are currently *{{length}} P2PL applicants* :dancers:",
+    "help1": "Hi {{name}}! What can I do for you ? :slightly_smiling_face:",
+    "help2": "This is what you can ask me:",
+    "help3": "`start` - start being paired \n`stop` - stop being paired \n`show profile` - your P2PL applicant profile \n`show all applicants` - list of all P2PL applicants",
+    "help4": "And because you're an Admin, you can also do:",
+    "help5": "`pair all applicants` - run the pairing algorithm and fill the Pairings Table in Airtable \n`introduce new pairings` - send a message to all applicants about their new pairings \n`send presentation message to no-applicants` - I introduce myself to people who are not applicants yet",
+    "default1": "Sorry {{name}}, but I'm too young to understand what you mean :flushed:",
+    "default2": "If you need help, just tell me `help` :wink:"
+  },
+  "pairingConversation": {
+
+  },
+  "startAPairingSession": {
+
+  }
+}

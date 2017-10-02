@@ -5,6 +5,7 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
 import asyncForEach from 'async-foreach'
+import { __ } from 'i18n'
 
 import {
   checkIfAdmin,
@@ -26,8 +27,8 @@ import firstTimeConversation from './firstTimeConversation'
 
 require('dotenv').config()
 
-const {forEach} = asyncForEach
-const {NODE_ENV} = process.env
+const { forEach } = asyncForEach
+const { NODE_ENV } = process.env
 
 if (!NODE_ENV) {
   console.log('Error: Specify in a .env file')
@@ -42,15 +43,15 @@ controller.hears('^pair all applicants$', ['direct_message', 'direct_mention'], 
     const isAdmin = await checkIfAdmin(bot, message)
     if (isAdmin) {
       const botReply = Promise.promisify(bot.reply)
-      await botReply(message, 'Ok, I\'ll start pairing people')
+      await botReply(message, __('hears.pairAllApplicants1'))
       const pairing = await pairAllApplicants(bot.config.id)
-      await botReply(message, `Pairing done, saved to Airtable.\n It contains ${pairing.pairs.length} pairs.`)
+      await botReply(message, __('hears.pairAllApplicants2', { length: pairing.pairs.length }))
     } else {
-      bot.reply(message, 'Sorry but it looks like you\'re not an admin. You can\'t use this feature.')
+      bot.reply(message, __('hears.notAdmin'))
     }
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
@@ -60,16 +61,16 @@ controller.hears('^introduce new pairings$', ['direct_message', 'direct_mention'
     const isAdmin = await checkIfAdmin(bot, message)
     if (isAdmin) {
       const botReply = Promise.promisify(bot.reply)
-      await botReply(message, 'Ok, I\'ll start introducing people :sparkles: ')
+      await botReply(message, __('hears.introduceNewPairing1'))
       const membersPaired = await startAPairingSession(bot, message)
       await pairingConversation(bot, message, membersPaired)
-      await botReply(message, 'All people have been introduced :rocket:')
+      await botReply(message, __('hears.introduceNewPairing2'))
     } else {
-      bot.reply(message, 'Sorry but it looks like you\'re not an admin. You can\'t use this feature.')
+      bot.reply(message, __('hears.notAdmin'))
     }
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
@@ -79,9 +80,9 @@ controller.hears('^send presentation message to no-applicants$', ['direct_messag
     const isAdmin = await checkIfAdmin(bot, message)
     if (isAdmin) {
       const botReply = Promise.promisify(bot.reply)
-      await botReply(message, 'Okay, I send a message to all people who are not applicants yet!')
+      await botReply(message, __('hears.presentationMessage1'))
       const noApplicants = await getAllNoApplicants(bot)
-      forEach(noApplicants, async function ({id, name}) {
+      forEach(noApplicants, async function ({ id, name }) {
         const done = this.async()
         if (NODE_ENV === 'PRODUCTION') {
           const records = await _getAllRecords(base('Companies').select({
@@ -89,19 +90,19 @@ controller.hears('^send presentation message to no-applicants$', ['direct_messag
             filterByFormula: `{Team ID} = '${bot.config.id}'`
           }))
           const formId = records[0].fields['Learnbot Form ID']
-          firstTimeConversation(bot, {user: id}, {name, formId})
+          firstTimeConversation(bot, { user: id }, { name, formId })
         } else {
           console.log('Send to', name)
         }
         done()
       })
-      await botReply(message, 'All done! :rocket:')
+      await botReply(message, __('hears.presentationMessage2'))
     } else {
-      bot.reply(message, 'Sorry but it looks like you\'re not an admin. You can\'t use this feature.')
+      bot.reply(message, __('hears.notAdmin'))
     }
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
@@ -110,28 +111,28 @@ controller.hears('^send presentation message to no-applicants$', ['direct_messag
 controller.hears(['^Hello$', '^Yo$', '^Hey$', '^Hi$', '^Ouch$'], ['direct_message', 'direct_mention'], async (bot, message) => {
   try {
     if (await checkIfFirstTime(bot, message) === false) return
-    const {name} = await getSlackUser(bot, message.user)
+    const { name } = await getSlackUser(bot, message.user)
     bot.startConversation(message, function (err, convo) {
       if (err) return console.log(err)
-      convo.say(`Hey ${name}!`)
-      convo.say(`I'm your new learning buddy 🐹 \nI will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪`)
-      convo.say(`If you ever want to stop being paired, which would be very sad 😥, just tell me \`stop\``)
+      convo.say(__('hears.hello1', { name }))
+      convo.say(__('hears.hello2'))
+      convo.say(__('hears.hello3'))
     })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
 controller.hears('^start$', ['direct_message', 'direct_mention'], async (bot, message) => {
   try {
     if (await checkIfFirstTime(bot, message) === false) return
-    bot.reply(message, 'Amaaaaaaaaaaaazing 🎉\'! I\'ll let you know when the next session starts! Happy Learning!')
-    const {name} = await getSlackUser(bot, message.user)
-    await updateApplicant(bot.config.id, name, {'Inactive': false})
+    bot.reply(message, __('hears.start'))
+    const { name } = await getSlackUser(bot, message.user)
+    await updateApplicant(bot.config.id, name, { 'Inactive': false })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
@@ -140,40 +141,40 @@ controller.hears('^stop$', ['direct_message', 'direct_mention'], async (bot, mes
     if (await checkIfFirstTime(bot, message) === false) return
     bot.startConversation(message, function (err, convo) {
       if (err) return console.log(err)
-      convo.say('Okay 😥, sorry to see you go.')
-      convo.say('You can start again by messaging me with `start`.')
+      convo.say(__('hears.stop1'))
+      convo.say(__('hears.stop2'))
     })
-    const {name} = await getSlackUser(bot, message.user)
-    await updateApplicant(bot.config.id, name, {'Inactive': true})
+    const { name } = await getSlackUser(bot, message.user)
+    await updateApplicant(bot.config.id, name, { 'Inactive': true })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
 controller.hears('^show profile$', ['direct_message', 'direct_mention'], async (bot, message) => {
   try {
     if (await checkIfFirstTime(bot, message) === false) return
-    const {name} = await getSlackUser(bot, message.user)
+    const { name } = await getSlackUser(bot, message.user)
     const rec = await getApplicant(bot.config.id, name)
-    const {fields} = await getMember(bot.config.id, rec.get('Applicant')[0])
+    const { fields } = await getMember(bot.config.id, rec.get('Applicant')[0])
     const isInactive = rec.get('Inactive') === true
     bot.reply(message, {
-      'text': `:sparkles: This is your profile <@${message.user}|${name}> :sparkles:`,
+      'text': __('hears.showProfile1', { id: message.user, name }),
       'attachments': [
         {
-          'title': isInactive ? ':sleeping: Inactive' : ':hand: Active',
-          'text': isInactive ? 'You\'re not gonna be paired with another P2PL applicants' : 'I can pair you with another P2PL applicants',
+          'title': isInactive ?  __('hears.showProfile2') : __('hears.showProfile3'),
+          'text': isInactive ? __('hears.showProfile4') : __('hears.showProfile5'),
           'color': isInactive ? '#E0E0E0' : '#81C784',
           'thumb_url': fields['Profile Picture'] ? fields['Profile Picture'][0].url : null
         },
         {
-          'title': ':sleuth_or_spy: Interests',
+          'title': __('hears.showProfile6'),
           'text': rec.get('Interests').join(', '),
           'color': '#64B5F6'
         },
         {
-          'title': ':muscle: Skills',
+          'title': __('hears.showProfile7'),
           'text': rec.get('Skills').join(', '),
           'color': '#E57373'
         }
@@ -181,7 +182,7 @@ controller.hears('^show profile$', ['direct_message', 'direct_mention'], async (
     })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
@@ -190,26 +191,26 @@ controller.hears('^show all applicants$', ['direct_message', 'direct_mention'], 
     if (await checkIfFirstTime(bot, message) === false) return
     const botReply = Promise.promisify(bot.reply)
     const apiUser = Promise.promisifyAll(bot.api.users)
-    await botReply(message, `Okay, don't move, I'm searching everybody :sleuth_or_spy:`)
+    await botReply(message, __('hears.showAllApplicant1'))
     const people = await getAllApplicants(bot.config.id)
-    const {members} = await apiUser.listAsync({token: bot.config.bot.app_token})
+    const { members } = await apiUser.listAsync({ token: bot.config.bot.app_token })
     const attachments = []
     forEach(people, async function (person) {
       const done = this.async()
-      const {fields} = await getMember(bot.config.id, person.applicant)
-      const {id} = _.find(members, (m) => m.name === person.name)
+      const { fields } = await getMember(bot.config.id, person.applicant)
+      const { id } = _.find(members, (m) => m.name === person.name)
       attachments.push({
-        'title': `:sparkles: <@${id}|${person.name}> :sparkles:`,
+        'title': __('hears.showAllApplicant2', { name: person.name, id }),
         'color': '#E57373',
         'thumb_url': fields['Profile Picture'] ? fields['Profile Picture'][0].url : null,
         'fields': [
           {
-            'title': ':sleuth_or_spy: Interests',
+            'title': __('hears.showAllApplicant3'),
             'value': person.interests.join(', '),
             'short': false
           },
           {
-            'title': ':muscle: Skills',
+            'title': __('hears.showAllApplicant4'),
             'value': person.skills.join(', '),
             'short': false
           }
@@ -218,7 +219,7 @@ controller.hears('^show all applicants$', ['direct_message', 'direct_mention'], 
       done()
     }, async () => {
       await botReply(message, {
-        'text': `There are currently *${people.length} P2PL applicants* :dancers:`
+        'text': __('hears.showAllApplicant5', { length: people.length })
       })
       forEach(attachments, async function (attachment) {
         const done = this.async()
@@ -230,20 +231,20 @@ controller.hears('^show all applicants$', ['direct_message', 'direct_mention'], 
     })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
 controller.hears(['^help$', '^options$'], ['direct_message', 'direct_mention'], async (bot, message) => {
   try {
     if (await checkIfFirstTime(bot, message) === false) return
-    const {name} = await getSlackUser(bot, message.user)
+    const { name } = await getSlackUser(bot, message.user)
     const botReply = Promise.promisify(bot.reply)
-    await botReply(message, `Hi ${name}! What can I do for you ? :slightly_smiling_face:`)
+    await botReply(message, __('hears.help1', { name }))
     await botReply(message, {
       attachments: [{
-        pretext: 'This is what you can ask me:',
-        text: `\`start\` - start being paired\n\`stop\` - stop being paired\n\`show profile\` - your P2PL applicant profile\n\`show all applicants\` - list of all P2PL applicants`,
+        pretext: __('hears.help2'),
+        text: __('hears.help3'),
         mrkdwn_in: ['text', 'pretext']
       }]
     })
@@ -251,30 +252,30 @@ controller.hears(['^help$', '^options$'], ['direct_message', 'direct_mention'], 
     if (isAdmin) {
       await botReply(message, {
         attachments: [{
-          pretext: 'And because you\'re an Admin, you can also do:',
-          text: `\`pair all applicants\` - run the pairing algorithm and fill the Pairings Table in Airtable\n\`introduce new pairings\` - send a message to all applicants about their new pairings\n\`send presentation message to no-applicants\` - I introduce myself to people who are not applicants yet`,
+          pretext: __('hears.help4'),
+          text: __('hears.help5'),
           mrkdwn_in: ['text', 'pretext']
         }]
       })
     }
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
 controller.hears('[^\n]+', ['direct_message', 'direct_mention'], async (bot, message) => {
   try {
     if (await checkIfFirstTime(bot, message) === false) return
-    const {name} = await getSlackUser(bot, message.user)
+    const { name } = await getSlackUser(bot, message.user)
     bot.startConversation(message, function (err, convo) {
       if (err) return console.log(err)
-      convo.say(`Sorry ${name}, but I'm too young to understand what you mean :flushed:`)
-      convo.say(`If you need help, just tell me \`help\` :wink:`)
+      convo.say(__('hears.default1', { name }))
+      convo.say(__('hears.default2'))
     })
   } catch (e) {
     console.log(e)
-    bot.reply(message, `Oops..! :sweat_smile: A little error occur: \`${e.message || e.error || e}\``)
+    bot.reply(message, __('hears.error', { error: e.message || e.error || e }))
   }
 })
 
