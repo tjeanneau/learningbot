@@ -49,9 +49,12 @@
     "default2": "If you need help, just tell me `help` :wink:"
   },
   "pairingConversation": {
-
+    "pairing": "Hey guys! I've paired you this month :smile:\n<@{{teacher}}>: <@{{learner}}> would like to know more about *{{skill}}. I'm sure you have a lot to share!\nI let you two arrange a meeting together, let me know about the date :blush:."
   },
   "startAPairingSession": {
-
+    "message1": "Hey, I only found a learning match for you. It means that you won't teach this month.\nBut next session you will have the priority :wink:\nLet me introduce you to <@{{teacher}}> who will tell you more about *{{learning}}*\nI will start a conversation with the two of you.",
+    "message2": "Hey, I just found the perfect pairing for you :smile:\nYou will share your experiences about *{{teaching}}* with <@{{learner}}>\nand <@{{teacher}}> will tell you more about *{{learning}}*\nI will start two separate conversation with them.",
+    "message3": "Hey, I only found a teaching match for you. It means that you won't learn this month.\nBut next session you will have the priority :wink:\nLet me introduce you to <@{{learnerName}}> who wants to learn more about *{{teaching}}*\nI will start a conversation with the two of you.",
+    "message4": "I'm a really sorry :pensive: I cannot find any pairing for you this month."
   }
 }

@@ -5,6 +5,7 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
 import asyncForEach from 'async-foreach'
+import { __ } from 'i18n'
 
 import { getMembersPaired } from '../methods'
 
@@ -22,22 +23,22 @@ export default async (bot) => {
     const channel = _.find(list, ['name', name]).id
     if (isLearner === true && isTeacher === false) {
       await botSay({
-        text: `Hey, I only found a learning match for you. It means that you won't teach this month.\nBut next session you will have the priority :wink:\nLet me introduce you to <@${teacherName}> who will tell you more about *${learning}*\nI will start a conversation with the two of you.`,
+        text: __('startAPairingSession.message1', { teacher: teacherName, learning }),
         channel
       })
     } else if (isLearner === true && isTeacher === true) {
       await botSay({
-        text: `Hey, I just found the perfect pairing for you :smile:\nYou will share your experiences about *${teaching}* with <@${learnerName}>\nand <@${teacherName}> will tell you more about *${learning}*\nI will start two separate conversation with them.`,
+        text: __('startAPairingSession.message2', { teacher: teacherName, learner: learnerName, learning, teaching }),
         channel
       })
     } else if (isLearner === false && isTeacher === true) {
       await botSay({
-        text: `Hey, I only found a teaching match for you. It means that you won't learn this month.\nBut next session you will have the priority :wink:\nLet me introduce you to <@${learnerName}> who wants to learn more about *${teaching}*\nI will start a conversation with the two of you.`,
+        text: __('startAPairingSession.message3', { learner: learnerName, teaching }),
         channel
       })
     } else {
       await botSay({
-        text: `I'm a really sorry :pensive: I cannot find any pairing for you this month.\n`, // "I'm sure you want to learn more about other skills: fill in this form to keep me updated on what you want to teach and learn."
+        text: __('startAPairingSession.message4'),
         channel
       })
     }

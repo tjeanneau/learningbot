@@ -5,6 +5,7 @@
 import _ from 'lodash'
 import Promise from 'bluebird'
 import asyncForEach from 'async-foreach'
+import { __ } from 'i18n'
 
 import { getBase } from '../airtable/index'
 import { getPairingsNotIntroduced } from '../methods'
@@ -59,7 +60,7 @@ export default async (bot, message, membersPaired) => {
     await apiGroups.inviteAsync({token, channel: groupId, user: bot.identifyBot().id})
     await airtableUpdate(pairing.id, {'Introduced': true})
     await botSay({
-      text: `Hey guys! I've paired you this month :smile:\n<@${teacher.name}>: <@${learner.name}> would like to know more about *${skill}*. I'm sure you have a lot to share!\nI let you two arrange a meeting together, let me know about the date :blush:.`,
+      text: __('pairingConversation.pairing', { teacher: teacher.name, learner: learner.name, skill }),
       channel: groupId
     })
     if (learner.id !== message.user && teacher.id !== message.user) {
