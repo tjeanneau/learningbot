@@ -3,7 +3,7 @@
  */
 
 import localTunnel from 'localtunnel'
-import Botkit from 'mangrove-botkit'
+import Botkit from 'botkit'
 import BotkitStorageMongo from 'botkit-storage-mongo'
 import Promise from 'bluebird'
 import { __ } from 'i18n'
@@ -29,12 +29,15 @@ if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET || !PORT || !MONGODB_URI || !NODE_E
 }
 
 if (NODE_ENV === 'DEVELOPMENT') {
-  const tunnel = localTunnel(PORT, {subdomain: 'devlearnbot'}, (err, tunnel) => {
+  const tunnel = localTunnel(PORT, { subdomain: 'learnbot' }, (err, tunnel) => {
     if (err) console.log(err)
     console.log(`Bot running at the url: ${tunnel.url}`)
   })
   tunnel.on('close', () => {
     console.log('Tunnel is closed')
+  })
+  tunnel.on('error', (err) => {
+    console.log('Error: ', err)
   })
 }
 
@@ -50,8 +53,7 @@ const controller = Botkit.slackbot({
   debug: false,
   interactive_replies: true,
   require_delivery: true,
-  storage: mongoStorage,
-  app_name: 'learnbot'
+  storage: mongoStorage
 })
 
 controller.configureSlackApp({
@@ -85,7 +87,7 @@ controller.on('create_bot', async (bot, config) => {
     })
     bot.startRTM((err) => {
       if (!err) trackBot(bot)
-      bot.startPrivateConversation({user: config.createdBy}, (err, convo) => {
+      bot.startPrivateConversation({ user: config.createdBy }, (err, convo) => {
         if (err) return console.log(err)
         convo.say(__('config.intro'))
       })
@@ -93,9 +95,9 @@ controller.on('create_bot', async (bot, config) => {
   }
 })
 
-controller.on('team_join', async function(bot,message) {
-  const {name} = await getSlackUser(bot, message.user)
-  await firstTimeConversation(bot, message, {name})
+controller.on('team_join', async function (bot, message) {
+  const { name } = await getSlackUser(bot, message.user)
+  await firstTimeConversation(bot, message, { name })
 })
 
 controller.on('rtm_open', () => {

@@ -7,5 +7,6 @@ import './learnbot/cron'
 i18n.configure({
   locales:['en', 'fr'],
   directory: __dirname + '/locales',
-  objectNotation: true
+  objectNotation: true,
+  defaultLocale: 'en',
 })
