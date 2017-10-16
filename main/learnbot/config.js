@@ -2,9 +2,8 @@
  * Created by thomasjeanneau on 08/02/2017.
  */
 
-import localTunnel from 'localtunnel'
 import Botkit from 'botkit'
-import BotkitStorageMongo from 'botkit-storage-mongo'
+import FirebaseStorage from 'botkit-storage-firebase'
 import Promise from 'bluebird'
 import { __ } from 'i18n'
 
@@ -18,35 +17,22 @@ const _bots = {}
 const {
   SLACK_CLIENT_ID,
   SLACK_CLIENT_SECRET,
-  MONGODB_URI,
+  FIREBASE_URI,
   PORT,
   NODE_ENV
 } = process.env
 
-if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET || !PORT || !MONGODB_URI || !NODE_ENV) {
-  console.log('Error: Specify SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, PORT, NODE_ENV and MONGODB_URI in a .env file')
+if (!SLACK_CLIENT_ID || !SLACK_CLIENT_SECRET || !PORT || !FIREBASE_URI || !NODE_ENV) {
+  console.log('Error: Specify SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, PORT, NODE_ENV and FIREBASE_URI in a .env file')
   process.exit(1)
-}
-
-if (NODE_ENV === 'DEVELOPMENT') {
-  const tunnel = localTunnel(PORT, { subdomain: 'learnbot' }, (err, tunnel) => {
-    if (err) console.log(err)
-    console.log(`Bot running at the url: ${tunnel.url}`)
-  })
-  tunnel.on('close', () => {
-    console.log('Tunnel is closed')
-  })
-  tunnel.on('error', (err) => {
-    console.log('Error: ', err)
-  })
 }
 
 const trackBot = (bot) => {
   _bots[bot.config.token] = bot
 }
 
-const mongoStorage = new BotkitStorageMongo({
-  mongoUri: MONGODB_URI
+const mongoStorage = new FirebaseStorage({
+  firebase_uri: FIREBASE_URI
 })
 
 const controller = Botkit.slackbot({
