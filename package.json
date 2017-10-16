@@ -2,7 +2,7 @@
   "name": "learnbot",
   "private": true,
   "scripts": {
-    "start": "npm run build && node dist/index.js",
+    "start": "npm run build && DEBUG=i18n:* node dist/index.js",
     "lint": "./node_modules/.bin/eslint main test; exit 0",
     "fix": "./node_modules/.bin/eslint --fix main test; exit 0",
     "build": "babel main -d dist",
@@ -23,7 +23,7 @@
     "bluebird": "3.5.0",
     "body-parser": "1.18.1",
     "botkit": "0.6.3",
-    "botkit-storage-mongo": "1.0.7",
+    "botkit-storage-firebase": "1.0.0",
     "cron": "1.2.1",
     "dotenv": "4.0.0",
     "express": "4.15.4",
@@ -33,7 +33,6 @@
     "long-timeout": "0.1.1",
     "moment": "2.18.1",
     "moment-timezone": "0.5.13",
-    "mongodb": "2.2.31",
     "request": "2.81.0",
     "vhost": "^3.0.2"
   },
@@ -46,7 +45,6 @@
     "eslint-plugin-node": "4.2.2",
     "eslint-plugin-promise": "3.5.0",
     "eslint-plugin-standard": "3.0.1",
-    "localtunnel": "1.8.3",
     "mocha": "3.5.3"
   },
   "description": "All our bots in one place!",
