@@ -26,7 +26,7 @@
     "presentationMessage1": "Okay, I send a message to all people who are not applicants yet!",
     "presentationMessage2": "All done! :rocket:",
     "hello1": "Hey {{name}}!",
-    "hello2": "I'm your new learning buddy 🐹 I will pair you every month with Mangrove people that wish to learn from your skills and people from whom you will learn new skills 💪",
+    "hello2": "I'm your new learning buddy 🐹 I will pair you every month with people that wish to learn from your skills and people from whom you will learn new skills 💪",
     "hello3": "If you ever want to stop being paired, which would be very sad 😥, just tell me `stop`",
     "start": "Amaaaaaaaaaaaazing 🎉! I'll let you know when the next session starts! Happy Learning!",
     "stop1": "Okay 😥, sorry to see you go.",
